@@ -12,34 +12,30 @@
 # compare -s and -v when running the tests
 # run coverage tests with python -m pytest --cov
 
+# test_oop_loan_pmt.py
+
+# test_oop_loan_pmt.py
+
 import pytest
-from datetime import date
-from friend import *
-
-
-### unit tests ###
-def test_calculate_current_age():
-    """
-    GIVEN a user enters the year they were born
-    WHEN that year is passed to this function
-    THEN the user's age is accurately calculated
-    """
-    print("\r")  # carriage return
-    print(" -- calculate_current_age unit test")
-    assert (
-        calculate_current_age(2000) == 23
-    )  # STATIC: will change as the years progress
-
-
-def test_calculate_current_age():
-    """
-    GIVEN a user enters the year they were born
-    WHEN that year is passed to this function
-    THEN the user's age is accurately calculated
-    """
-    birth_year = 1995
-    today = date.today()
-    expected_age = today.year - birth_year
-    assert (
-        calculate_current_age(birth_year) == expected_age
-    )  # DYNAMIC: calculates the current year
+from oop_loan_pmt import Loan, collectLoanDetails
+ 
+def test_getDiscountFactor():
+    loan = Loan(100000, 30, 0.06)
+    loan.calculateDiscountFactor()
+    assert loan.getDiscountFactor() == pytest.approx(166.7916, 0.01)
+ 
+def test_calculateLoanPmt():
+    loan = Loan(100000, 30, 0.06)
+    loan.calculateLoanPmt()
+    assert loan.getLoanPmt() == pytest.approx(599.55, 0.01)
+ 
+def test_collectLoanDetails(monkeypatch):
+    input_values = [100000, 30, 0.06]
+    def mock_input(s):
+        return input_values.pop(0)
+    monkeypatch.setattr('builtins.input', mock_input)
+    loan = collectLoanDetails()
+    assert loan.loanAmount == 100000
+    assert loan.numberOfPmts == 360
+    assert loan.periodicIntRate == pytest.approx(0.005, 0.01)
+    assert loan.annualRate == 0.06
